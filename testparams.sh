@@ -1,0 +1,12 @@
+NAME=Sierra Anderson
+COLLABORATOR=No one in particular
+SEQUENCE_TYPE=Illumina
+YEAR=2015
+ABUNDANCE_DATA=KO2Sample_T2D.tab
+METADATA=Sample2Class_T2D.tab
+ENRICHMENT=Yes
+ENRICHMENT_TEST=t-test
+NORMALIZATION=None
+OUTPUT_DIR=Current
+PCA=yes
+PCA_TYPE=pca
