@@ -7,9 +7,10 @@ Created on Thu Jan 08 10:48:19 2015
 
 from scipy import stats
 import math
-from sklearn.decomposition import PCA
 import pandas as pd
 from matplotlib import pyplot as plt
+import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 
 def check_params(p):
     # keep this updated as new parameters are added to the file
@@ -30,8 +31,12 @@ def check_params(p):
         
     if "pca" not in parameters:
         parameters["pca"] = "n"
-    elif "pca_type" not in parameters:
-        parameters["pca_type"] = "pca"
+    
+    if "pcoa" not in parameters:
+        parameters["pcoa"] = "n"
+        
+    if "pcoa" in parameters and "dist_type" not in parameters:
+        parameters["dist_type"] = "braycurtis"
     
     if "normalization" not in parameters:
         parameters["normalization"] = "none"
@@ -164,33 +169,67 @@ def enrichment(enrichment_test, mg_profile, output_dir, filename="p-values.tab")
     
     f.close()
     
-def pca(pca_type, mg_profile, output_dir, filename="pca.png"):    
-    if pca_type == "pcoa":
-        None
-        # do the pcoa (to-do)
-    else: # do the pca
-        abundances = sep_abundances(mg_profile)
-        abundance_ctrl = abundances[0]
-        abundance_exp = abundances[1]    
-        ctrl_count = abundance_ctrl.shape[0]        
-        df = pd.concat([abundance_ctrl, abundance_exp])
+def pcoa(mg_profile, output_dir, filename="pcoa.png", dist_type="euclidean"):
+    abundances = sep_abundances(mg_profile)
+    abundance_ctrl = abundances[0]
+    abundance_exp = abundances[1]    
+    ctrl_count = abundance_ctrl.shape[0]        
+    df = pd.concat([abundance_ctrl, abundance_exp])
         
-        mypca = PCA(n_components=2)
-        sklearnpca = mypca.fit_transform(df)
-        plt.plot(sklearnpca[0:ctrl_count,0], sklearnpca[0:ctrl_count,1], 'o', markersize=7, \
-        color='blue', alpha=0.5, label="control")
+    dist_matrix = pairwise_distances(df, metric=dist_type)
         
-        plt.plot(sklearnpca[ctrl_count:,0], sklearnpca[ctrl_count:,1], '^', markersize=7, \
-        color='red', alpha=0.5, label="experimental")
+    # 9.20 
+    A_matrix = dist_matrix * dist_matrix / -2
         
-        plt.legend()
-        plt.xlabel('PC1')
-        plt.ylabel('PC2')
-        plt.title('PCA')
+    n = int(A_matrix.shape[0]) 
+    a_mean = np.mean(A_matrix)
         
-        if output_dir != "current":
-            filename = output_dir + "\\" + filename
+    # 9.21
+    ctr_matrix = [[0 for i in range(n)] for j in range(n)]        
         
-        plt.savefig(filename)
+    for i in range(n):
+        for j in range(n):
+            s = A_matrix[i][j] - np.mean(A_matrix[i][:]) - np.mean(A_matrix[:][j]) + a_mean
+            ctr_matrix[i][j] = s
         
-        return sklearnpca
+    eig_val, eig_vec = np.linalg.eig(ctr_matrix)
+
+    eig_pairs = [(eig_val[i], eig_vec[:,i]) for i in range(len(eig_val))]
+
+    eig_pairs.sort()
+    eig_pairs.reverse()        
+        
+    PC1 = eig_pairs[0][1]      
+    PC2 = eig_pairs[1][1]
+    
+    my_sum = 0
+    for i in range(len(eig_val)):
+        my_sum += eig_val[i]
+        
+    PC1_variance = eig_pairs[0][0]/my_sum * 100
+    PC2_variance = eig_pairs[1][0]/my_sum * 100
+    plt.clf()
+    plt.plot(PC1[0:ctrl_count], PC2[0:ctrl_count], 'o', markersize=5, color='blue', \
+    alpha=0.5, label="control")
+    plt.plot(PC1[ctrl_count:], PC2[ctrl_count:], '^', markersize=5, color='red', \
+    alpha=0.5, label="experimental")
+    
+    if dist_type != "euclidean":
+        title = "PCoA"
+    else:
+        title = "PCA"
+        
+    plt.title(title)
+    plt.xlabel('PC1 (' + str(round(PC1_variance, 2)) + '%)')
+    plt.ylabel('PC2 (' + str(round(PC2_variance, 2)) + '%)')
+    plt.legend()
+    
+    if dist_type != "euclidean" and filename == "pcoa.png":
+        filename =  "pcoa_" + dist_type + ".png"
+    
+    if output_dir != "current":
+        filename = output_dir + "\\" + filename
+    
+    plt.savefig(filename)    
+    plt.clf()
+    

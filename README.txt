@@ -36,9 +36,19 @@ KO2Sample_T2D.tab and Sample2Class_T2D.tab - real abundance data and metadata re
 3. DEPENDENCIES
 
 pandas
+http://pandas.pydata.org/
+
 scipy.stats
-sklearn.decomposition.PCA
+http://docs.scipy.org/doc/scipy/reference/stats.html
+
+sklearn.metrics.pairwise.pairwise_distances
+http://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.pairwise_distances.html
+
 matplotlib.pyplot
+http://matplotlib.org/api/pyplot_api.html
+
+numpy
+http://www.numpy.org/
 
 4. FUNCTIONS AND OUTPUT
 
@@ -48,6 +58,7 @@ Enrichment: Performs either a student’s t test or the Wilcoxon rank-sum test on 
 
 PCA: Performs a principal component analysis on the two classes of samples over their abundance data, with blue circles denoting control samples and red triangles for experimental samples. Output is saved in a file pca.png.
 
+PCoA: Performs a principal coordinate analysis on the two classes of samples over their abundance data. Several types of distances are available, all from sklearnmetrics.pairwise.pairwise_distances, including "braycurtis" (default), "jaccard", "manhattan", and "cosine." Output is saved in a file pcoa_(distance type).png
 
 5. PARAMETERS
 
@@ -106,4 +117,15 @@ Required: No
 Keyword: PCA 
 Description: Indiciates whether a principal component analysis should be performed.
 Options: Yes, No (default)
+Required: No
+
+Keyword: PCoA
+Description: Indicates whether a principal coordinate analysis should be performed. 
+Options: Yes, No (default)
+Required: No
+
+Keyword: Dist_type
+Description: If a PCoA is to be performed, indicates what distance metric to be used. 
+Options: euclidean, manhattan, cosine, braycurtis (default), jaccard, correlation 
+full list here http://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.pairwise_distances.html 
 Required: No

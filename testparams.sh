@@ -9,4 +9,5 @@ ENRICHMENT_TEST=t-test
 NORMALIZATION=None
 OUTPUT_DIR=Current
 PCA=yes
-PCA_TYPE=pca
+PCOA=yes
+DIST_TYPE=braycurtis

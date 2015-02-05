@@ -9,7 +9,7 @@ Created on Thu Dec 18 10:57:25 2014
 
 from sys import argv
 import mgprofile
-import ca_functions
+import ca_functions3 as ca_functions # change this back probably
 import os
 script, filename = argv
 
@@ -36,8 +36,10 @@ def main():
     
     # perform pca
     if params["pca"][0] == 'y':
-        ca_functions.pca(params["pca_type"], mp, output_dir=params["output_dir"])
-    
+        ca_functions.pcoa(mp, output_dir=params["output_dir"], filename="pca.png")
+    if params["pcoa"][0] == 'y':
+        ca_functions.pcoa(mp, output_dir=params["output_dir"], dist_type=params["dist_type"])
+        
     if params["output_dir"] == "current":
         output_dir = os.getcwd()
     else:
