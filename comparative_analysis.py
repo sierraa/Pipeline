@@ -9,7 +9,7 @@ Created on Thu Dec 18 10:57:25 2014
 
 from sys import argv
 import mgprofile
-import ca_functions3 as ca_functions # change this back probably
+import ca_functions
 import os
 script, filename = argv
 
