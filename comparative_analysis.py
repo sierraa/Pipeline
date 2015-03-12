@@ -1,51 +1,48 @@
-#!/usr/bin/python
-
 # -*- coding: utf-8 -*-
 """
-Created on Thu Dec 18 10:57:25 2014
+Created on Mon Mar 02 10:12:43 2015
 
-@author: Sierra
+@author: Sierra Anderson
+
+Perform a comparative analysis on metagenomic abundance data.
 """
 
 from sys import argv
-import mgprofile
-import ca_functions
-import os
 script, filename = argv
 
-p = open(filename)
-                
+from check_params import check_params
+import mgprofile
+import normalization
+import pcoa
+import enrichment
+import area_plot
+
 def main():
+    parameters = check_params(filename)
     
-    params = ca_functions.check_params(p)
-    
+    # Create a metagenomic profile
     mp = mgprofile.metagenomic_profile()
-    mp.create_profile(title=params["name"], collaborator=params["collaborator"], \
-    year=params["year"], sequence_type=params["sequence_type"], abundance_data=params["abundance_data"], \
-    metadata=params["metadata"])
+    mp.create_profile(parameters)
     
-    # perform normalization
-    if params["normalization"] != "n":
-        ca_functions.normalization(normalization_type=params["normalization"], \
-        mg_profile=mp, output_dir=params["output_dir"])
-    
-    # perform enrichment test
-    if params["enrichment"][0] == "y":
-        ca_functions.enrichment(enrichment_test=params["enrichment_test"], \
-        mg_profile=mp, output_dir=params["output_dir"])
-    
-    # perform pca
-    if params["pca"][0] == 'y':
-        ca_functions.pcoa(mp, output_dir=params["output_dir"], filename="pca.png")
-    if params["pcoa"][0] == 'y':
-        ca_functions.pcoa(mp, output_dir=params["output_dir"], dist_type=params["dist_type"])
+    # Perform normalization
+    if parameters["normalization"] != "none":
+        normalization.normalize(mp, parameters)
         
-    if params["output_dir"] == "current":
-        output_dir = os.getcwd()
-    else:
-        output_dir = params["output_dir"]
+    # Enrichment stuff 
+    if parameters["enrichment"][0] == "y":
+        enrichment.enrichment_test(mp, parameters)
     
-    print("Tests complete. Output saved at " + output_dir)
-                
+    # PCA and PCOA
+    if parameters["pca"][0] == "y":
+        pcoa.plot(mp, "euclidean", parameters["output_dir"])
+    
+    if parameters["pcoa"][0] == "y":
+        pcoa.plot(mp, parameters["dist_type"], parameters["output_dir"])
+        
+    if parameters["area_plot"][0] == "y":
+        area_plot.plot(mp, parameters)
+    
+    print("Tests complete.")    
+
 if __name__ == "__main__":
     main()
