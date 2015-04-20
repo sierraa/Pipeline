@@ -8,7 +8,7 @@ Perform enrichment tests for this data and write results to file.
 """
 
 from scipy import stats
-from qsturng import qsturng
+#from qsturng import qsturng
 import math
 
 def enrichment_test(profile, parameters):
@@ -23,11 +23,11 @@ def enrichment_test(profile, parameters):
         #do multiple comparisons
         if parameters["pairwise"][0] == "t":
             corrected_pairwise(profile, parameters)
-        else:
-            tukey_hsd(profile, parameters)
+#        else:
+#            tukey_hsd(profile, parameters)
  
 def ranksums(profile):
-    key_list = profile.references.keys()
+    key_list = list(profile.references.keys())
     class_1 = profile.abundance_data.loc[profile.references[key_list[0]]]
     class_2 = profile.abundance_data.loc[profile.references[key_list[1]]]
     
@@ -51,7 +51,7 @@ def ranksums(profile):
     return pvals, nans
     
 def ttest(profile):
-    key_list = profile.references.keys()
+    key_list = list(profile.references.keys())
     class_1 = profile.abundance_data.loc[profile.references[key_list[0]]]
     class_2 = profile.abundance_data.loc[profile.references[key_list[1]]]
     
@@ -86,7 +86,6 @@ def corrected_pairwise(profile, parameters):
     for k in key_list:
         data[k] = profile.abundance_data.loc[profile.references[k]]
         
-        
     for i in range(len(data.keys()) - 1):
         for j in range(i + 1, len(data.keys())):
             fname = str(data.keys()[i]) + "_vs_" + str(data.keys()[j]) + ".tab"
@@ -96,7 +95,7 @@ def corrected_pairwise(profile, parameters):
                 p, n = ttest(profile)
             corrected_p = [x * m for x in p]
             to_file(corrected_p, n, parameters["output_dir"], fname)
-
+"""
 def tukey_hsd(profile, parameters, filename="tukey.tab", alpha=0.05):
     key_list = profile.references.keys()
     k = len(profile.references)
@@ -135,7 +134,7 @@ def tukey_hsd(profile, parameters, filename="tukey.tab", alpha=0.05):
         f.write("\t")
         f.write(str(sig[a][0]))
         f.write("\n")
-    
+ """   
 def calc_mse(data):
     """
     Calculate mean standard error

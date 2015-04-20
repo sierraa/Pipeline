@@ -44,7 +44,7 @@ def main():
     df = pd.DataFrame(index=initial.index, columns=paths.keys())
     
     for s in initial.index:
-        for p in pathm.index:
+        for p in pathm.index:   
             d = sum(initial.loc[s, paths[p]])
             df[p][s] = d
     

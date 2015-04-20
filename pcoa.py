@@ -4,18 +4,36 @@ Created on Tue Mar 03 11:23:21 2015
 
 @author: Sierra Anderson
 
-Generate plot Principal Coordinate Analysis (PCoA). Save file to pcoa.png.    
+Plot Principal Coordinate Analysis (PCoA). Save file to pcoa.png.    
 Calculate using methods described in Numerical Ecology (Legendre 1998).     
 A Principal Compoenent Analysis (PCA) is a PCoA performed with an 
 euclidean distance matrix. This is the default analysis. 
+
 """
 import pandas as pd
 import numpy as np
+import warnings
 from sklearn.metrics.pairwise import pairwise_distances
 from matplotlib import pyplot as plt
 
-def plot(profile, dist_type, output_dir):
-    colors = ['blue', 'yellow', 'green', 'magenta', 'cyan', 'black', 'red', 'white']
+def plot(profile, output_dir, dist_type="euclidean", filename="pca.png"):
+    """
+    Generate PCoA or PCA plot for given metagenomic profile abundance data. 
+    A PCA is a PCoA with a euclidean distance metric.
+    
+    profile -- instance of metagenomic profile class 
+    output_dir -- directory for image to be saved in 
+    dist_type -- distance metric to be used (default="euclidean" [PCA])
+    filename -- name of file to be saved. If distance metric is not euclidean, 
+    it will be saved as "pcoa_(dist_type).png" (default="pca.png")
+    """
+    warnings.simplefilter("ignore", np.ComplexWarning) # complex numbers must be cast to real in order to plot
+    
+    # blue, yellow, red, green, magenta, sea green, orange, purple, lime green,
+    # hot pink, cyan, dark red, dark blue, peach, gray, dark green, lavendar
+    colors = ["#0000ff", "#ffff00", "#ff0000", "#00ff00", "#ff0066", "#99ff99", "#ff9900", 
+         "#660066", "#99ff00", "#ff0099", "#99ffff", "#990000", "#000066", "#ff9966",
+         "#c0c0c0", "#006600", "#cc99ff"]
     markers = ['o', 'D', 'v', 'd', '<', 'h' '+', 's', '>', '|', 'p', 'H', '.', 'x', \
     '*', '^', ',', '_']
     
@@ -25,7 +43,7 @@ def plot(profile, dist_type, output_dir):
         
     #now for each class i have the abundances associated w them
      
-    df = pd.concat(abundances_to_class.values())
+    df = pd.concat(list(abundances_to_class.values()))
     
     # effectively sorted now     
     
@@ -89,8 +107,6 @@ def plot(profile, dist_type, output_dir):
         
     if dist_type != "euclidean":    
         filename =  "pcoa_" + dist_type + ".png"
-    else:
-        filename = "pca.png"
     
     if output_dir != "current":
         filename = output_dir + "\\" + filename

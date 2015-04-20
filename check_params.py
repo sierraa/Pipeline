@@ -4,16 +4,20 @@ Created on Mon Mar 02 09:55:09 2015
 
 @author: Sierra Anderson
 
-Checks parameters file for correctness
+Check parameters file for correctness. Exit if parameters file not found. Raise
+NameError if crucial data (abundance data and metadata) is absent from parameters file.
+
 """
+
 import os.path
 import sys
 
 def check_params(filename):
-    """
-    Check parameters passed to the script for correctness.
+    """Check parameters passed to the script for correctness.
     Print message to user if parameters are incorrect.
     Raise NameError if filenames for data are not included or are not found.
+    
+    filename -- name of the file containing the parameters
     
     Return dictionary containing parameters.
     """
@@ -80,16 +84,26 @@ def check_params(filename):
         parameters["output_dir"] = "current"
     
     if "enrichment" not in parameters:
-        parameters["enrichment"] = "n"
+        parameters["enrichment"] = "f"
     elif "enrichment_test" not in parameters:
-        parameters["enrichment_test"] = "default"
-        
+        parameters["enrichment_test"] = "ttest"
+    
+    if "pairwise" in parameters and "correction_type" not in parameters:
+        parameters["correction_type"] = "bonferroni"
+    
     if "multiple_comparisons" not in parameters:
         parameters["multiple_comparisons"] = "false"
     elif "pairwise" not in parameters:
         parameters["pairwise"] = "false"
         
     if "area_plot" not in parameters:
-        parameters["area_plot"] = "no"        
+        parameters["area_plot"] = "false"
+    if "plot_individual_classes" not in parameters:
+        parameters["plot_individual_classes"] = "false"        
         
+    if "to_html" not in parameters:
+        parameters["to_html"] = "false"
+    if "open_page" not in parameters:
+        parameters["open_page"] = "false"
+    
     return parameters

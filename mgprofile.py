@@ -5,6 +5,7 @@ Created on Mon Mar 02 10:18:48 2015
 @author: Sierra Anderson
 
 Class instance representing metagenomic profile containing all data.
+
 """
 
 import pandas as pd
